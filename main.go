@@ -1,17 +1,20 @@
 package main
 
 import (
-	"fmt"
+	"embed"
+	"html/template"
 	"net/http"
 )
 
-var messages = []string{
-	"zprava 1",
-	"zprava 2",
-}
+//go:embed html/messages.gohtml
+var html embed.FS
+var tmpl = template.Must(template.ParseFS(html, "html/messages.gohtml"))
+
+var messages []string
 
 func main() {
 	http.HandleFunc("GET /", listMessages)
+	http.HandleFunc("POST /send", newMessage)
 
 	err := http.ListenAndServe(":8080", nil)
 	if err != nil {
@@ -20,7 +23,11 @@ func main() {
 }
 
 func listMessages(w http.ResponseWriter, r *http.Request) {
-	for _, m := range messages {
-		fmt.Fprintf(w, "%s\n", m)
-	}
+	tmpl.Execute(w, messages)
+}
+
+func newMessage(w http.ResponseWriter, r *http.Request) {
+	r.ParseForm()
+	messages = append(r.Form["message"], messages...)
+	http.Redirect(w, r, r.Header.Get("Referer"), http.StatusFound)
 }
