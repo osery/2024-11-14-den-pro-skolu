@@ -5,11 +5,18 @@ import (
 	"net/http"
 )
 
+var messages = []string{
+	"zprava 1",
+	"zprava 2",
+}
+
 func main() {
-	http.HandleFunc("GET /", helloWorld)
+	http.HandleFunc("GET /", listMessages)
 	http.ListenAndServe(":8080", nil)
 }
 
-func helloWorld(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, "Hello world!")
+func listMessages(w http.ResponseWriter, r *http.Request) {
+	for _, m := range messages {
+		fmt.Fprintf(w, "%s\n", m)
+	}
 }
