@@ -16,7 +16,7 @@ func main() {
 	http.HandleFunc("GET /", listMessages)
 	http.HandleFunc("POST /send", newMessage)
 
-	err := http.ListenAndServe(":8080", nil)
+	err := http.ListenAndServeTLS(":443", "certs/fullchain.pem", "certs/privkey.pem", nil)
 	if err != nil {
 		panic(err)
 	}
