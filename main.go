@@ -1,22 +1,25 @@
 package main
 
 import (
-	"fmt"
+	"html/template"
 	"net/http"
 )
 
-var messages = []string{
-	"zprava 1",
-	"zprava 2",
-}
+var messages []string
 
 func main() {
 	http.HandleFunc("GET /", listMessages)
+	http.HandleFunc("POST /send", newMessage)
 	http.ListenAndServe(":8080", nil)
 }
 
 func listMessages(w http.ResponseWriter, r *http.Request) {
-	for _, m := range messages {
-		fmt.Fprintf(w, "%s\n", m)
-	}
+	page, _ := template.ParseGlob("html/messages.gohtml")
+	page.Execute(w, messages)
+}
+
+func newMessage(w http.ResponseWriter, r *http.Request) {
+	r.ParseForm()
+	messages = append(r.Form["message"], messages...)
+	http.Redirect(w, r, r.Header.Get("Referer"), http.StatusFound)
 }
