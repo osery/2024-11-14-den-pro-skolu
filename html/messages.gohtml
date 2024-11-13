@@ -1,0 +1,14 @@
+<html>
+  <body>
+    <form action="/send" method="post">
+      <input type="text" id="message" name="message">
+      <input type="submit" value="Send">
+    </form>
+
+
+    {{ range . }}
+      <h5>{{ . }}</h5>
+    {{ end }}
+
+  </body>
+</html>
